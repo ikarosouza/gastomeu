@@ -1,0 +1,30 @@
+server:
+  port: 8080
+  servlet:
+    contextPath: /gastomeu
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/gastomeu
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: HikariCP
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      pool-prepared-statements: true
+      prepared-statements-cache-size: 250
+      connection-test-query: SELECT 1
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+logging:
+  level:
+    org.springframework.web: DEBUG
