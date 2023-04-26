@@ -1,5 +1,7 @@
 package br.com.reiosse.gastomeu.service.impl;
 
+import br.com.reiosse.gastomeu.dto.request.CreditCardRequestDTO;
+import br.com.reiosse.gastomeu.mapper.CreditCardMapper;
 import br.com.reiosse.gastomeu.model.CreditCard;
 import br.com.reiosse.gastomeu.repository.CreditCardRepository;
 import br.com.reiosse.gastomeu.service.CreditCardService;
@@ -13,9 +15,11 @@ import java.util.List;
 public class CreditCardServiceImpl implements CreditCardService {
 
     private final CreditCardRepository creditCardRepository;
+    private final CreditCardMapper creditCardMapper;
 
     @Override
-    public CreditCard saveCreditCard(CreditCard creditCard) {
+    public CreditCard saveCreditCard(CreditCardRequestDTO creditCardRequestDTO) {
+        CreditCard creditCard = creditCardMapper.toCreditCard(creditCardRequestDTO);
         return creditCardRepository.save(creditCard);
     }
 

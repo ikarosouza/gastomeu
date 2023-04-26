@@ -1,5 +1,6 @@
 package br.com.reiosse.gastomeu.controller;
 
+import br.com.reiosse.gastomeu.dto.request.TransactionRequestDTO;
 import br.com.reiosse.gastomeu.model.Transaction;
 import br.com.reiosse.gastomeu.service.TransactionService;
 import lombok.AllArgsConstructor;
@@ -44,8 +45,8 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<Transaction> saveTransaction(@RequestBody Transaction transaction) {
-        Transaction savedTransaction = transactionService.saveTransaction(transaction);
+    public ResponseEntity<List<Transaction>> saveTransaction(@RequestBody TransactionRequestDTO transactionRequestDTO) {
+        List<Transaction> savedTransaction = transactionService.saveTransaction(transactionRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedTransaction);
     }
 

@@ -1,5 +1,7 @@
 package br.com.reiosse.gastomeu.service.impl;
 
+import br.com.reiosse.gastomeu.dto.request.TransactionRequestDTO;
+import br.com.reiosse.gastomeu.mapper.TransactionMapper;
 import br.com.reiosse.gastomeu.model.Transaction;
 import br.com.reiosse.gastomeu.repository.TransactionRepository;
 import br.com.reiosse.gastomeu.service.TransactionService;
@@ -16,11 +18,16 @@ import java.util.List;
 public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
+    private final TransactionMapper transactionMapper;
 
     @Override
-    public List<Transaction> saveTransaction(Transaction transaction) {
-        if(transaction.getIsCreditCardTransaction()){
-            return saveCreditCardTransaction(transaction);
+    public List<Transaction> saveTransaction(TransactionRequestDTO transactionRequestDTO) {
+        Transaction transaction = transactionMapper.toTransaction(transactionRequestDTO);
+        if(transactionRequestDTO.getCreditCardId() == null) {
+            transaction.setCreditCard(null);
+        }
+        if(transaction.getInstallments() > 1){
+            return saveInstallmentTransaction(transaction);
         }
         return List.of(transactionRepository.save(transaction));
     }
@@ -51,7 +58,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
 
-    private List<Transaction> saveCreditCardTransaction(Transaction transaction) {
+    private List<Transaction> saveInstallmentTransaction(Transaction transaction) {
         List<Transaction> transactions = new ArrayList<>();
         var originalTransaction = transactionRepository.save(transaction);
         transactions.add(originalTransaction);
@@ -64,12 +71,18 @@ public class TransactionServiceImpl implements TransactionService {
                         .transactionDate(transaction.getTransactionDate())
                         .description(transaction.getDescription())
                         .title(transaction.getTitle())
-                        .isCreditCardTransaction(true)
+                        .isCreditCardTransaction(transaction.getIsCreditCardTransaction())
                         .installments(i)
-                        .installmentValue(transaction.getTotalValue().divide(BigDecimal.valueOf(transaction.getInstallments()), 2, RoundingMode.HALF_UP))
                         .isRecurring(true)
                         .originalTransactionId(originalTransaction.getId())
                         .build();
+
+                if(transaction.getIsCreditCardTransaction()){
+                    installmentTransaction.setInstallmentValue(transaction.getTotalValue()
+                            .divide(BigDecimal.valueOf(transaction.getInstallments()), 2, RoundingMode.HALF_UP));
+                } else {
+                    installmentTransaction.setInstallmentValue(transaction.getInstallmentValue());
+                }
 
                 if (i == 1) {
                     installmentTransaction.setBillingDate(transaction.getBillingDate());

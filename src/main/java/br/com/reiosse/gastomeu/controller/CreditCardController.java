@@ -1,5 +1,6 @@
 package br.com.reiosse.gastomeu.controller;
 
+import br.com.reiosse.gastomeu.dto.request.CreditCardRequestDTO;
 import br.com.reiosse.gastomeu.model.CreditCard;
 import br.com.reiosse.gastomeu.service.CreditCardService;
 import lombok.AllArgsConstructor;
@@ -31,19 +32,19 @@ public class CreditCardController {
     }
 
     @PostMapping
-    public ResponseEntity<CreditCard> createCreditCard(@RequestBody CreditCard creditCard) {
-        CreditCard savedCreditCard = creditCardService.saveCreditCard(creditCard);
+    public ResponseEntity<CreditCard> createCreditCard(@RequestBody CreditCardRequestDTO creditCardRequestDTO) {
+        CreditCard savedCreditCard = creditCardService.saveCreditCard(creditCardRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedCreditCard);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CreditCard> updateCreditCard(@PathVariable Long id, @RequestBody CreditCard creditCard) {
+    public ResponseEntity<CreditCard> updateCreditCard(@PathVariable Long id, @RequestBody CreditCardRequestDTO creditCardRequestDTO) {
         CreditCard existingCreditCard = creditCardService.getCreditCardById(id);
         if (existingCreditCard == null) {
             return ResponseEntity.notFound().build();
         }
-        creditCard.setId(id);
-        CreditCard updatedCreditCard = creditCardService.saveCreditCard(creditCard);
+        creditCardRequestDTO.setId(id);
+        CreditCard updatedCreditCard = creditCardService.saveCreditCard(creditCardRequestDTO);
         return ResponseEntity.ok(updatedCreditCard);
     }
 
